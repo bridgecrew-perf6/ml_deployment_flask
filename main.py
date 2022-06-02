@@ -4,7 +4,8 @@ from tensorflow import keras
 from flask import Flask
 from flask import request
 from PIL import Image
-from flask import jsonify
+from waitress import serve
+
 import os
 
 app = Flask(__name__)
@@ -49,4 +50,5 @@ def infer():
 
 if __name__ == '__main__':
   use_port = os.getenv("PORT") if os.getenv("PORT") is not None else 5003
-  app.run(debug = True, port=use_port)
+  # app.run(debug = True, port=use_port)
+  serve(app, host='0.0.0.0', port=use_port)

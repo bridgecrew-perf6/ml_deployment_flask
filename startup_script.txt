@@ -4,6 +4,14 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:deadsnakes/ppa -y
-sudo apt update
 sudo apt install python3.10 -y
 sudo apt install python3-pip -y
+
+
+sudo apt install python3-waitress
+
+git clone https://github.com/pesanbotol/ml_deployment_flask.git
+cd ~/ml_deployment_flask
+pip3 install -r requirements.txt --no-cache-dir
+gsutil cp -r gs://pesanbotol-mlmodel/model_v1 .
+python3 main.py
