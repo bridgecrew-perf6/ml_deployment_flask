@@ -11,11 +11,12 @@ import os
 app = Flask(__name__)
 
 image = keras.preprocessing.image
-preprocess_input = keras.applications.inception_v3.preprocess_input
-vgg16 = keras.applications.VGG16(include_top=False)
-reconstructed_model = keras.models.load_model("model_v1")
+preprocess_input = keras.applications.mobilenet_v2.preprocess_input
 
-def prepare_image(src_img):
+nudity_model = keras.models.load_model("nudity_v2_mobilenet")
+landmark_model = keras.models.load_model("landmark_v1_mobilenet")
+
+def prepare_image_mobilenet(src_img):
   """
   Convert PIL image (In memory) to RGB image (Sometimes the input image is in RGBA)
   then resize to 224x224 (Input size of the model)
@@ -28,12 +29,12 @@ def prepare_image(src_img):
   img = np.expand_dims(img, axis=0)
   return preprocess_input(img)
 
-@app.route('/infer', methods = ['POST'])
-def infer():
+@app.route('/nudity', methods = ['POST'])
+def inferNudity():
   f = request.files['file']
   img = Image.open(f)
-  prepared = prepare_image(img)
-  infered = reconstructed_model(prepared)
+  prepared = prepare_image_mobilenet(img)
+  infered = nudity_model(prepared)
 
   # Dimension 0 is batch image, dimension 1 is the result float
   # infered is in Tensor format, convert to normal Python float
@@ -48,7 +49,31 @@ def infer():
   
   return res
 
+@app.route('/landmark', methods = ['POST'])
+def inferLandmark():
+  f = request.files['file']
+  img = Image.open(f)
+  prepared = prepare_image_mobilenet(img)
+  infered = landmark_model(prepared)
+
+  # Dimension 0 is batch image, dimension 1 is the result float
+  # infered is in Tensor format, convert to normal Python float
+  # infer_float = float(infered[0][0])
+
+  # is_not_safe = False if infer_float > 0.5 else True
+
+  # res = {
+  #   "safety_score": infer_float,
+  #   "depict_nudity": is_not_safe
+  # }
+  print(infered)
+  
+  return "a"
+
+
+
 if __name__ == '__main__':
-  use_port = os.getenv("PORT") if os.getenv("PORT") is not None else 5003
-  # app.run(debug = True, port=use_port)
-  serve(app, host='0.0.0.0', port=use_port)
+  use_port = int(os.environ.get("PORT", 8080))
+  print(f"App run on port {use_port}")
+  app.run(debug = True, host='0.0.0.0', port=use_port)
+  # serve(app, host='0.0.0.0', port=use_port)
