@@ -1,7 +1,7 @@
 # Install or update needed software
 sudo apt-get update
 sudo apt-get install -yq git supervisor python3 python3-pip python3-distutils
-pip install --upgrade pip virtualenv
+sudo pip install --upgrade pip virtualenv
 
 # Fetch source code
 export HOME=/root
@@ -11,19 +11,19 @@ sudo git clone https://github.com/pesanbotol/ml_deployment_flask.git /opt/app
 sudo bash /opt/app/gce/add-google-cloud-ops-agent-repo.sh --also-install
 
 # Account to own server process
-/usr/sbin/useradd -m -d /home/pythonapp pythonapp
+sudo /usr/sbin/useradd -m -d /home/pythonapp pythonapp
 
 # Python environment setup
-virtualenv -p python3 /opt/app/venv
+sudo virtualenv -p python3 /opt/app/venv
 /bin/bash -c "source /opt/app/venv/bin/activate"
-/opt/app/venv/bin/pip install -r /opt/app/requirements.txt
+sudo /opt/app/venv/bin/pip install -r /opt/app/requirements.txt
 
 # Set ownership to newly created account
-chown -R pythonapp:pythonapp /opt/app
+sudo chown -R pythonapp:pythonapp /opt/app
 
 # Put supervisor configuration in proper place
-cp /opt/app/python-app.conf /etc/supervisor/conf.d/python-app.conf
+sudo cp /opt/app/python-app.conf /etc/supervisor/conf.d/python-app.conf
 
 # Start service via supervisorctl
-supervisorctl reread
-supervisorctl update
+sudo supervisorctl reread
+sudo supervisorctl update

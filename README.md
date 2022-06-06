@@ -8,3 +8,8 @@ and must have a filesystem, so, unfortunately Compute Engine it is
 
 Due  to limitation of Github repo size, the model is not included in this repo :'(
 After cloning this repo to GCE, we need to download the model from cloud storage manually
+
+
+nohup waitress-serve --port=8080 "main:app" &
+ctrl z
+jobs fg

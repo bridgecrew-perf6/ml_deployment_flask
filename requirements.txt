@@ -2,5 +2,7 @@ numpy
 tensorflow
 flask
 pillow
+pandas
 
 gunicorn==20.1.0
+honcho==1.1.0
