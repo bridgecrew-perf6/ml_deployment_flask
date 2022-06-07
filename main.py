@@ -7,6 +7,9 @@ from flask import request
 from PIL import Image
 from waitress import serve
 import pandas as pd
+import requests
+from io import BytesIO
+
 
 import os
 
@@ -19,7 +22,6 @@ nudity_model = keras.models.load_model("nudity_v2_mobilenet")
 
 landmark_model = keras.models.load_model("landmark_v1_model/indonesia_landmark_model_MobileNetV2_100epoch.h5")
 landmark_classes = pd.read_csv('landmark_v1_model/label_name.csv', header=0)
-print(landmark_classes)
 
 def prepare_image_mobilenet(src_img):
   """
@@ -36,8 +38,13 @@ def prepare_image_mobilenet(src_img):
 
 @app.route('/nudity', methods = ['POST'])
 def inferNudity():
-  f = request.files['file']
-  img = Image.open(f)
+  if ('file' in request.files):
+    f = request.files['file']
+    img = Image.open(f)
+  elif ('url' in request.json):
+    response = requests.get(request.json['url'])
+    img = Image.open(BytesIO(response.content))
+
   prepared = prepare_image_mobilenet(img)
   infered = nudity_model(prepared)
 
@@ -69,8 +76,13 @@ def prepare_image_landmark(src_img):
 
 @app.route('/landmark', methods = ['POST'])
 def inferLandmark():
-  f = request.files['file']
-  img = Image.open(f)
+  if ('file' in request.files):
+    f = request.files['file']
+    img = Image.open(f)
+  elif ('url' in request.json):
+    response = requests.get(request.json['url'])
+    img = Image.open(BytesIO(response.content))
+
   prepared = prepare_image_landmark(img)
   infered = landmark_model(prepared)
 
@@ -89,8 +101,6 @@ def inferLandmark():
   }  
 
   return res
-
-
 
 if __name__ == '__main__':
   use_port = int(os.environ.get("PORT", 8080))
