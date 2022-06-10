@@ -3,6 +3,7 @@ tensorflow
 flask
 pillow
 pandas
+requests
 
 gunicorn==20.1.0
 honcho==1.1.0
